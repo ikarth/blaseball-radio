@@ -41,6 +41,7 @@ def announceText(message):
     blaseball_name = random.choice(["blaseball", "blaze ball", "blace ball", "blace ball","blace ball","blace ball","blace ball","blace ball","blace ball","blace ball","blace ball", "blace ball"])
     message = message.replace(" US ", " us ")
     message = message.replace("BLASEBALL", blaseball_name)
+    message = message.replace("Blaseball", blaseball_name)
     message = message.replace("blaseball", blaseball_name)
 
     speech_engine.say(message)
@@ -282,6 +283,7 @@ def makeCommentary(game_state, has_started):
         commentary.append(grammar.flatten("#origin#"))
         if has_started:
             commentary.append(f"The score is {game_state['awayScore']} to {game_state['homeScore']}. ")
+            commentary.append(f"The score is {game_state['awayScore']} to {game_state['homeScore']}. ")
             commentary.append(f"The count is {game_state['atBatBalls']} and {game_state['atBatStrikes']}. ")
             commentary.append(f"There are {game_state['baserunnerCount']} runners on base. ")
             commentary.append(f"The count is {game_state['atBatBalls']} and {game_state['atBatStrikes']} with {game_state['halfInningOuts']} outs. ")
@@ -354,13 +356,13 @@ def makeCommentary(game_state, has_started):
 
     ticker_text = [x["msg"] for x in retrieveData("global_ticker")]
     commentary = commentary + ticker_text
-    commentary = [x for x in commentary if len(x) < 244]
+    commentary = [x for x in commentary if len(x) < 100]
     return commentary
 
 #running_commentary = makeCommentary(rd[0], False)
 #pprint.pprint(running_commentary)
 
-current_game_day = 107
+current_game_day = 108
 
 def getPlayoffTranscripts():
     global current_game_day
@@ -376,8 +378,13 @@ def getPlayoffTranscripts():
     if (data[game_number]["gameComplete"] == True):
         finished = True
     if (data[game_number]["gameStart"] == False):
-        print("(waiting for the next game)", end=" ")
-        time.sleep(30)
+        wait_time = 60 - datetime.datetime.now().minute
+        if (wait_time > 2):
+            print(f"(waiting for the next game in {wait_time} minutes)", end=" ")
+            time.sleep(30)
+        else:
+            print("(soon)", end=" ")
+            time.sleep(3)
     return announce_text, commentary, finished
 
 last_announce_text = ""
@@ -394,24 +401,33 @@ def getABunchOfTranscripts():
         announce_text = last_announce_text
     if last_announce_text != announce_text:
         announceText(announce_text)
-        speech_engine.runAndWait()
+        #speech_engine.runAndWait()
+        speech_engine.startLoop(True)
         last_announce_text = announce_text
     else:
         if not finished:
             if random.random() > 0.5:
                 if len(commentary) > 0:
                     announceText( random.choice(commentary) )
-                    speech_engine.runAndWait()
+                    speech_engine.startLoop(True)
+                    #speech_engine.runAndWait()
                 else:
                     print("(waiting)", end="")
-                    time.sleep(15)
-                #speech_engine.runAndWait()
+                    time.sleep(5)
+
+
     return finished
+
+
+def onEnd(name, completed):
+    speech_engine.endLoop()
+speech_engine.connect('finished-utterance', onEnd)
 
 for n in range(40):
     print()
 game_over = False
 while current_game_day < 120:
+
     while not game_over:
         game_over = getABunchOfTranscripts()
         time.sleep(0.1)
@@ -419,5 +435,5 @@ while current_game_day < 120:
             getABunchOfTranscripts()
             current_game_day += 1
             print(current_game_day)
+    game_over = False
     print(".", end="")
-    time.sleep(60)
