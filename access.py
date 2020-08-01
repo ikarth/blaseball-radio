@@ -48,8 +48,8 @@ def announceText(message):
 
 def mungeFuncName(name):
     name = name.replace(" ", "_")
-    name = name.replace("(", "/")
-    name = name.replace(")", "/")
+    name = name.replace("(", "")
+    name = name.replace(")", "")
     name = name.replace(",", "")
     return name
 
@@ -252,8 +252,8 @@ print("-----------------------------------------------------------------")
 
 
 
-rd = retrieveData("GamesOnDay", (103, 1))
-print(rd)
+#rd = retrieveData("GamesOnDay", (103, 1))
+#print(rd)
 def makeCommentary(game_state, has_started):
     #pprint.pprint(game_state)
 
@@ -334,27 +334,29 @@ def makeCommentary(game_state, has_started):
 
     ticker_text = [x["msg"] for x in retrieveData("global_ticker")]
     commentary = commentary + ticker_text
+    commentary = [x for x in commentary if len(x) < 244]
     return commentary
 
-running_commentary = makeCommentary(rd[0], False)
-pprint.pprint(running_commentary)
+#running_commentary = makeCommentary(rd[0], False)
+#pprint.pprint(running_commentary)
 
-current_game_day = 106
+current_game_day = 107
 
 def getPlayoffTranscripts():
     global current_game_day
     game_season = 1
+    game_number = 0
 
     game_day = current_game_day
     data = getSpecificData(get_GamesOnDay, (game_day, game_season))
-    announce_text = data[0]["lastUpdate"]
-    #pprint.pprint(data[0])
-    commentary = makeCommentary(data[0], data[0]["gameStart"])
+    announce_text = data[game_number]["lastUpdate"]
+    #pprint.pprint(data[game_number])
+    commentary = makeCommentary(data[game_number], data[game_number]["gameStart"])
     finished = False
-    if (data[0]["gameComplete"] == True):
+    if (data[game_number]["gameComplete"] == True):
         finished = True
-    if (data[0]["gameStart"] == False):
-        print("(waiting for the next game)")
+    if (data[game_number]["gameStart"] == False):
+        print("(waiting for the next game)", end=" ")
         time.sleep(30)
     return announce_text, commentary, finished
 
@@ -377,16 +379,19 @@ def getABunchOfTranscripts():
     else:
         if not finished:
             if random.random() > 0.5:
-                announceText( random.choice(commentary) )
-                speech_engine.runAndWait()
+                if len(commentary) > 0:
+                    announceText( random.choice(commentary) )
+                    speech_engine.runAndWait()
+                else:
+                    print("(waiting)", end="")
+                    time.sleep(15)
+                #speech_engine.runAndWait()
     return finished
 
 for n in range(40):
     print()
 game_over = False
 while current_game_day < 120:
-
-
     while not game_over:
         game_over = getABunchOfTranscripts()
         time.sleep(0.1)
