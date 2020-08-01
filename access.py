@@ -254,50 +254,81 @@ print("-----------------------------------------------------------------")
 
 rd = retrieveData("GamesOnDay", (103, 1))
 print(rd)
-def makeCommentary(game_state):
+def makeCommentary(game_state, has_started):
     #pprint.pprint(game_state)
 
     commentary = []
     try:
         commentary.append("Check out twitch.tv/blaseball_radio for commentary by humans. ")
         commentary.append("Check out twitch.tv/blaseball_radio for human-driven commentary. ")
-        commentary.append(f"The count is {game_state['atBatBalls']} and {game_state['atBatStrikes']}. ")
-        commentary.append(f"There are {game_state['baserunnerCount']} runners on base. ")
-        commentary.append(f"The count is {game_state['atBatBalls']} and {game_state['atBatStrikes']} with {game_state['halfInningOuts']} outs. ")
-        commentary.append(f"You are listening to {game_state['awayTeamNickname']} at {game_state['homeTeamNickname']}. ")
-        commentary.append(f"You are listening to {game_state['awayTeamNickname']} at {game_state['homeTeamNickname']}. ")
-        commentary.append(f"You are listening to {game_state['awayTeamNickname']} at {game_state['homeTeamNickname']}. ")
-        commentary.append(f"It is a beautiful solar eclipse here at the {game_state['awayTeamNickname']} vs. the {game_state['homeTeamNickname']}. ")
-        commentary.append(f"You are listening to {game_state['awayTeamName']} vs. {game_state['homeTeamName']}. ")
-        if game_state['topOfInning']:
-            commentary.append(f"It is the top of the {game_state['inning'] + 1}th. ")
-            commentary.append(f"{game_state['homePitcherName']} is pitching for the {game_state['homeTeamNickname']}. ")
-            commentary.append(f"{game_state['awayBatterName']} is batting for the {game_state['awayTeamNickname']}. ")
-            commentary.append(f"{game_state['homePitcherName']} is on the mound. ")
-        else:
-            commentary.append(f"It is the bottom of the {game_state['inning'] + 1}th. ")
-            commentary.append(f"{game_state['awayPitcherName']} is pitching for the {game_state['awayTeamNickname']}. ")
-            commentary.append(f"{game_state['homeBatterName']} is batting for the {game_state['homeTeamNickname']}. ")
-            commentary.append(f"{game_state['awayPitcherName']} is on the mound. ")
+        if has_started:
+            commentary.append(f"The score is {game_state['awayScore']} to {game_state['homeScore']}. ")
+            commentary.append(f"The count is {game_state['atBatBalls']} and {game_state['atBatStrikes']}. ")
+            commentary.append(f"There are {game_state['baserunnerCount']} runners on base. ")
+            commentary.append(f"The count is {game_state['atBatBalls']} and {game_state['atBatStrikes']} with {game_state['halfInningOuts']} outs. ")
+            commentary.append(f"You are listening to {game_state['awayTeamNickname']} at {game_state['homeTeamNickname']}. ")
+            commentary.append(f"You are listening to {game_state['awayTeamNickname']} at {game_state['homeTeamNickname']}. ")
+            commentary.append(f"You are listening to {game_state['awayTeamNickname']} at {game_state['homeTeamNickname']}. ")
+            commentary.append(f"It is a beautiful solar eclipse here at the {game_state['awayTeamNickname']} vs. the {game_state['homeTeamNickname']}. ")
+            commentary.append(f"You are listening to {game_state['awayTeamName']} vs. {game_state['homeTeamName']}. ")
+            commentary.append(f"You are listening to {game_state['awayTeamName']} vs. {game_state['homeTeamName']}. The score is {game_state['awayScore']} to {game_state['homeScore']}. ")
+            base_runners = []
+            if game_state['basesOccupied'][0]:
+                base_runners.append("first")
+            if game_state['basesOccupied'][1]:
+                base_runners.append("second")
+            if game_state['basesOccupied'][2]:
+                base_runners.append("third")
+            base_runners_str = ""
+            if len(base_runners) > 0:
+                if len(base_runners) > 1:
+                    base_runners[-1] = "and " + base_runners[-1]
+                commentary.append(f"There are runners on {', '.join(base_runners)}. ")
+
+            if game_state['topOfInning']:
+                commentary.append(f"It is the top of the {game_state['inning'] + 1}th. ")
+                commentary.append(f"{game_state['homePitcherName']} is pitching for the {game_state['homeTeamNickname']}. ")
+                commentary.append(f"{game_state['awayBatterName']} is batting for the {game_state['awayTeamNickname']}. ")
+                commentary.append(f"{game_state['homePitcherName']} is on the mound. ")
+            else:
+                commentary.append(f"It is the bottom of the {game_state['inning'] + 1}th. ")
+                commentary.append(f"{game_state['awayPitcherName']} is pitching for the {game_state['awayTeamNickname']}. ")
+                commentary.append(f"{game_state['homeBatterName']} is batting for the {game_state['homeTeamNickname']}. ")
+                commentary.append(f"{game_state['awayPitcherName']} is on the mound. ")
         commentary.append("The floating shard is a blaseball fan.")
         commentary.append("Crying in Blaseball is ERROR SIGNAL LOST")
-        if random.random() < 0.3:
-            players = [game_state['homePitcher'], game_state['homeBatter'], game_state['awayPitcher'], game_state['awayBatter']]
-            for p in players:
-                if p != '':
-                    p_data = retrieveData("player_stats", args=str(p))
-                    #pprint.pprint(p_data)
-                    for p_stat, p_val in p_data[0].items():
-                        d_str = ""
-                        if p_stat == "_id":
-                            p_val = "_id"
-                        if isinstance(p_val, str):
-                            d_str = f"The {p_stat} of {p_data[0]['name']} is {p_val}. "
-                        if isinstance(p_val, int):
-                            d_str = f"{p_data[0]['name']} has {p_val} {p_stat}. "
-                        if isinstance(p_val, float):
-                            d_str = f"{p_data[0]['name']} has a {p_stat} of {round(decimal.Decimal(p_val), 2)}. "
-                        commentary.append(d_str)
+        commentary.append("We need bigger machines.")
+        commentary.append("no thoughts only blaseball.")
+        commentary.append("what is happening.")
+        commentary.append("BLASEBALL: AMERICA'S FINAL PASTIME")
+        commentary.append("Reminder that it is now #PARTYTIME for all eliminated teams. They can never stop.")
+
+
+        if not has_started:
+            commentary.append("The broadcast will resume when the next game starts.")
+            commentary.append("The broadcast will resume when the next game starts.")
+            commentary.append("The broadcast will resume when the next game starts.")
+            commentary.append("The broadcast will resume when the next game starts.")
+        if has_started:
+            if random.random() < 0.3:
+                players = [game_state['homePitcher'], game_state['homeBatter'], game_state['awayPitcher'], game_state['awayBatter']]
+                for p in players:
+                    if p != '':
+                        p_data = retrieveData("player_stats", args=str(p))
+                        #pprint.pprint(p_data)
+                        xtra_stat_list = ["earned look average", "go / no-go ratio", "intentional shade", "contributing editor", "inverse strike-out percentage", "on-field plus cuteness", "yodeling", "hot dogs per inning", "t-shirt cannon accuracy"]
+                        p_data[0] = p_data[0].update({x: random.random() for x in xtra_stat_list})
+                        for p_stat, p_val in p_data[0].items():
+                            d_str = ""
+                            if p_stat == "_id":
+                                p_val = "_id"
+                            if isinstance(p_val, str):
+                                d_str = f"The {p_stat} of {p_data[0]['name']} is {p_val}. "
+                            if isinstance(p_val, int):
+                                d_str = f"{p_data[0]['name']} has {p_val} {p_stat}. "
+                            if isinstance(p_val, float):
+                                d_str = f"{p_data[0]['name']} has a {p_stat} of {round(decimal.Decimal(p_val), 2)}. "
+                            commentary.append(d_str)
     except:
         commentary.append("The Shard is watching.")
 
@@ -305,10 +336,10 @@ def makeCommentary(game_state):
     commentary = commentary + ticker_text
     return commentary
 
-running_commentary = makeCommentary(rd[0])
+running_commentary = makeCommentary(rd[0], False)
 pprint.pprint(running_commentary)
 
-current_game_day = 104
+current_game_day = 106
 
 def getPlayoffTranscripts():
     global current_game_day
@@ -318,12 +349,13 @@ def getPlayoffTranscripts():
     data = getSpecificData(get_GamesOnDay, (game_day, game_season))
     announce_text = data[0]["lastUpdate"]
     #pprint.pprint(data[0])
-    commentary = makeCommentary(data[0])
+    commentary = makeCommentary(data[0], data[0]["gameStart"])
     finished = False
     if (data[0]["gameComplete"] == True):
         finished = True
     if (data[0]["gameStart"] == False):
-        time.sleep(5)
+        print("(waiting for the next game)")
+        time.sleep(30)
     return announce_text, commentary, finished
 
 last_announce_text = ""
@@ -349,12 +381,18 @@ def getABunchOfTranscripts():
                 speech_engine.runAndWait()
     return finished
 
+for n in range(40):
+    print()
 game_over = False
 while current_game_day < 120:
+
+
     while not game_over:
         game_over = getABunchOfTranscripts()
         time.sleep(0.1)
         if game_over:
             getABunchOfTranscripts()
-    current_game_day += 1
-    time.sleep(5)
+            current_game_day += 1
+            print(current_game_day)
+    print(".", end="")
+    time.sleep(60)
