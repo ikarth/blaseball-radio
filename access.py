@@ -362,7 +362,7 @@ def makeCommentary(game_state, has_started):
 #running_commentary = makeCommentary(rd[0], False)
 #pprint.pprint(running_commentary)
 
-current_game_day = 108
+current_game_day = 110
 
 def getPlayoffTranscripts():
     global current_game_day
@@ -373,14 +373,20 @@ def getPlayoffTranscripts():
     data = getSpecificData(get_GamesOnDay, (game_day, game_season))
     announce_text = data[game_number]["lastUpdate"]
     #pprint.pprint(data[game_number])
+
+    if "game over" in announce_text.lower():
+        announce_text += f"The final score is {data[game_number]['awayScore']} to {data[game_number]['homeScore']}. "
+
     commentary = makeCommentary(data[game_number], data[game_number]["gameStart"])
+
+
     finished = False
     if (data[game_number]["gameComplete"] == True):
         finished = True
     if (data[game_number]["gameStart"] == False):
         wait_time = 60 - datetime.datetime.now().minute
         if (wait_time > 2):
-            print(f"(waiting for the next game in {wait_time} minutes)", end=" ")
+            print(f"(waiting for the next game [{current_game_day}] in {wait_time} minutes)")
             time.sleep(30)
         else:
             print("(soon)", end=" ")
@@ -400,6 +406,7 @@ def getABunchOfTranscripts():
         commentary = last_commentary
         announce_text = last_announce_text
     if last_announce_text != announce_text:
+
         announceText(announce_text)
         #speech_engine.runAndWait()
         speech_engine.startLoop(True)
