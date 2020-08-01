@@ -250,7 +250,25 @@ stat_translation = {
 
 print("-----------------------------------------------------------------")
 
+tracery_commentary_grammar = {
+"subject": ["Blaseball", "#other_subject#",],
+"other_subject": ["Blaseball", "The Tim Tebow CFL Chronicles", "Blaseball", "The Hades Tigers", "The Commisioner", "The Hellmouth Sunbeams", "The Canada Moist Talkers", "The Houston Spies"],
+"obj": ["is the sport of #kings#", "brings together all of the #kings#", "is for #kings#", "is doing a good job"],
+"kings": ["kings", "umpires", "vampires", "people", "common masses", "pyromaniacs", "lovers", "shoe thieves", "gamblers", "streamers", "bloggers", "kids"],
+"origin": ["#subject# #obj#. "]
+}
 
+rules = {
+    'origin': '#hello.capitalize#, #location#!',
+    'hello': ['hello', 'greetings', 'howdy', 'hey'],
+    'location': ['world', 'solar system', 'galaxy', 'universe']
+}
+
+from tracery.modifiers import base_english
+
+grammar = tracery.Grammar(tracery_commentary_grammar)
+grammar.add_modifiers(base_english)
+print(grammar.flatten("#origin#"))
 
 #rd = retrieveData("GamesOnDay", (103, 1))
 #print(rd)
@@ -261,6 +279,7 @@ def makeCommentary(game_state, has_started):
     try:
         commentary.append("Check out twitch.tv/blaseball_radio for commentary by humans. ")
         commentary.append("Check out twitch.tv/blaseball_radio for human-driven commentary. ")
+        commentary.append(grammar.flatten("#origin#"))
         if has_started:
             commentary.append(f"The score is {game_state['awayScore']} to {game_state['homeScore']}. ")
             commentary.append(f"The count is {game_state['atBatBalls']} and {game_state['atBatStrikes']}. ")
@@ -309,6 +328,7 @@ def makeCommentary(game_state, has_started):
             commentary.append("The broadcast will resume when the next game starts.")
             commentary.append("The broadcast will resume when the next game starts.")
             commentary.append("The broadcast will resume when the next game starts.")
+            commentary.append("This is the season of the San Francisco Lovers.")
         if has_started:
             if random.random() < 0.3:
                 players = [game_state['homePitcher'], game_state['homeBatter'], game_state['awayPitcher'], game_state['awayBatter']]
