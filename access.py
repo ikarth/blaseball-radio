@@ -48,8 +48,8 @@ def announceText(message):
 
 def mungeFuncName(name):
     name = name.replace(" ", "_")
-    name = name.replace("(", "")
-    name = name.replace(")", "")
+    name = name.replace("(", "/")
+    name = name.replace(")", "/")
     name = name.replace(",", "")
     return name
 
