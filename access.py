@@ -1,4 +1,4 @@
-import pyttsx3
+import pyttsx3 # for text-to-speech
 import json
 import glob
 import datetime
@@ -13,8 +13,8 @@ import decimal
 from pathlib import Path
 from modernblaseball.modern_blaseball import blaseball_api
 
-import gtts
-from playsound import playsound
+# import gtts
+# from playsound import playsound
 
 
 speech_engine = pyttsx3.init()
