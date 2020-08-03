@@ -284,6 +284,8 @@ def makeCommentary(game_state, has_started):
         if has_started:
             commentary.append(f"The score is {game_state['awayScore']} to {game_state['homeScore']}. ")
             commentary.append(f"The score is {game_state['awayScore']} to {game_state['homeScore']}. ")
+            commentary.append(f"The score is {game_state['awayTeamNickname']} {game_state['awayScore']} to {game_state['homeTeamNickname']} {game_state['homeScore']}. ")
+            commentary.append(f"The score is {game_state['awayTeamNickname']} {game_state['awayScore']} to {game_state['homeTeamNickname']} {game_state['homeScore']}. ")
             commentary.append(f"The count is {game_state['atBatBalls']} and {game_state['atBatStrikes']}. ")
             commentary.append(f"There are {game_state['baserunnerCount']} runners on base. ")
             commentary.append(f"The count is {game_state['atBatBalls']} and {game_state['atBatStrikes']} with {game_state['halfInningOuts']} outs. ")
